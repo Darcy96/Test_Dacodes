@@ -122,12 +122,13 @@ const ButtonMenu = memo(() => {
 									</Typography>
 								</Box>
 
+
 								<IconButton
 									color="info"
 									onClick={handleLogout}
 									size="small"
-									aria-label="Cerrar sesión"
-									title="Cerrar sesión"
+									aria-label="Logout"
+									title="Logout"
 								>
 									<Logout />
 								</IconButton>
