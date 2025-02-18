@@ -1,60 +1,60 @@
-# 🚗 Vehicle Transfer Module (Next.js & TypeScript)
+# Transfer Management System
 
-Welcome to the **Vehicle Transfer Module**! 🎉 This is a technical test project designed to simulate the management of vehicle transfers in a CMS. The application is built using **Next.js**, **TypeScript**, and **Material UI** for a robust and aesthetically pleasing user experience.
+A web application built with Next.js 13+ that manages transfers with GitHub authentication. Includes a user management system and a modern design using Material UI.
 
----
+## 🌐 Demo
 
-## **📦 Features**
+You can try the live application here: [https://test-dacodes.vercel.app/](https://test-dacodes.vercel.app/)
 
-- 🔐 **Authentication**: Mock authentication with roles (`admin`, `editor`, `viewer`) and permissions.
-- 📄 **CRUD Operations**: Create, read, update, and delete vehicle transfers.
-- 🔍 **Filtering**: Filter transfers by plate or type.
-- 🛠️ **Responsive Design**: Fully responsive UI built with Material UI components.
-- 🎭 **Mock Backend**: Simulated backend with in-memory data and JSON mocks.
+## 🚀 Key Features
 
----
-## **🌍 Live Demo**
+- **Authentication**
+  - GitHub Login
+  - Session management with NextAuth
+  - Custom user menu with avatar
 
-The application is deployed on both **Vercel** and **Render** for testing purposes:
+- **Transfer Management**
+  - Transfer list with filters
+  - Transfer creation and editing
+  - Deletion with confirmation
+  - Validated forms
 
-- 🌐 **Vercel**: [https://test-moraleda.vercel.app/](https://test-moraleda.vercel.app/)
-- 🌐 **Render**: [https://test-moraleda.onrender.com/](https://test-moraleda.onrender.com/)
+- **UI/UX**
+  - Responsive interface with Material UI
+  - Reusable components
+  - Visual feedback with spinners and dialogs
+  - Mobile-adaptive design
 
----
-## **🔑 User Roles for Testing**
+- **Data Management**
+  - Mocked API endpoints for demonstration
+  - React Query for state management
+  - Simulated CRUD operations
+  - Optimistic updates for better UX
 
-The application includes mock users for testing different roles and permissions. Use the following credentials to test authentication and access control:
+## 🛠️ Technologies
 
-| **Username** | **Password** | **Role**   | **Permissions**          |
-|--------------|--------------|------------|--------------------------|
-| admin        | admin123     | admin      | create, edit, delete     |
-| editor       | editor123    | editor     | create, edit             |
-| viewer       | viewer123    | viewer     | (No permissions)         |
+- Next.js 13+
+- TypeScript
+- Material UI
+- NextAuth.js
+- React Query (with mocked data)
+- Jest & React Testing Library
 
-- **Admin**: Full access to all features.
-- **Editor**: Can create and edit transfers but cannot delete.
-- **Viewer**: Read-only access; cannot create, edit, or delete transfers.
+## 🏗️ Architecture
 
----
+The project follows an organized architecture:
+- Atomic Design (atoms, molecules, organisms, templates)
+- State management with Context API
+- Custom hooks for business logic
+- Next.js routing system
+- Mocked API services for demonstration
 
-## **🚀 Installation Guide**
+## 🔧 Environment Variables for Local Use
+Create a `.env.local` file with:
+
+GITHUB_CLIENT_ID=Ov23li6jBdCPtsjgtLGA
+GITHUB_CLIENT_SECRET=1e92f153ed091f886e10fe96c42849008c77ccef
+NEXTAUTH_SECRET=1234567890
+NEXTAUTH_URL=http://localhost:3000
 
 
-2. Install Dependencies
-This project uses Yarn for package management. If you don't have Yarn installed, you can install it globally:
-
-### **1. Clone the Repository**
-```bash
-git clone https://github.com/Darcy96/Test_Moraleda.git
-cd Test_Moraleda
-```
-
-### **2. Install Dependencies**
-```bash
-npm install -g yarn
-```
-
-### **3. Run the Application**
-```bash
-yarn dev
-```
