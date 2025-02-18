@@ -53,8 +53,11 @@ The project follows an organized architecture:
 Create a `.env.local` file with:
 
 GITHUB_CLIENT_ID=Ov23li6jBdCPtsjgtLGA
+
 GITHUB_CLIENT_SECRET=1e92f153ed091f886e10fe96c42849008c77ccef
+
 NEXTAUTH_SECRET=1234567890
+
 NEXTAUTH_URL=http://localhost:3000
 
 
