@@ -34,23 +34,45 @@ export default function TransferTable() {
 	}, [isLoading, isError, error, filteredTransfers, headers])
 
 	return (
-		<Box>
+		<Box 
+			role="region" 
+			aria-label="Transfers table section"
+		>
 			<Filter
 				filters={filters}
 				setFilters={setFilters}
 				transfers={transfers}
+				aria-labelledby="transfer-filters"
+				aria-label="Transfer filters"
 			/>
 			{spinnerMessage ? (
 				<MySpinner message={spinnerMessage} />
 			) : (
-				<Paper sx={{ borderRadius: '8px', boxShadow: 'inherit', color: 'rgb(230, 235, 241)', border: '1px solid' }}>
+				<Paper 
+					sx={{ borderRadius: '8px', boxShadow: 'inherit', color: 'rgb(230, 235, 241)', border: '1px solid' }}
+					role="region"
+					aria-label="Transfers data"
+				>
 					{headers && (
-						<TableContainer sx={{ maxHeight: '80vh', borderRadius: '8px' }}>
-							<Table stickyHeader>
+						<TableContainer 
+							sx={{ maxHeight: '80vh', borderRadius: '8px' }}
+							tabIndex={0}
+							role="region"
+							aria-label="Scrollable transfers table"
+						>
+							<Table 
+								stickyHeader
+								aria-labelledby="transfer-filters"
+								role="grid"
+							>
 								<TableHead>
-									<TableRow>
+									<TableRow role="row">
 										{headers.map((header) => (
-											<TableCell key={header}>
+											<TableCell 
+												key={header}
+												role="columnheader"
+												aria-sort="none"
+											>
 												<Typography
 													variant="subtitle1"
 													fontWeight={600}
@@ -69,10 +91,23 @@ export default function TransferTable() {
 											key={transfer.id}
 											sx={{ cursor: 'pointer' }}
 											onClick={() => router.push(`/transfers/edit/${transfer.id}`)}
+											onKeyDown={(e) => {
+												if (e.key === 'Enter' || e.key === ' ') {
+													router.push(`/transfers/edit/${transfer.id}`)
+												}
+											}}
+											tabIndex={0}
+											role="row"
+											aria-label={`Transfer ${transfer.id} - ${transfer.plate}`}
 										>
 											{headers.map((header) => (
-												<TableCell key={header}>
-													{header === 'created_at' ? new Date(transfer[header] as string).toLocaleString() : transfer[header]}
+												<TableCell 
+													key={header}
+													role="gridcell"
+												>
+													{header === 'created_at' 
+														? new Date(transfer[header] as string).toLocaleString() 
+														: transfer[header]}
 												</TableCell>
 											))}
 										</TableRow>

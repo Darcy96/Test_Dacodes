@@ -26,16 +26,26 @@ export default function LoginPage() {
 		>
 			Login
 		</Typography>
+		
 
 		<StyledGithubButton
 			variant="contained"
 			size="large"
 			onClick={() => login()}
+			onKeyDown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					login()
+				}
+			}}
 			startIcon={<GitHubIcon />}
-			aria-label="Login with GitHub"
+			aria-label="Login with GitHub, this will redirect you to GitHub to authenticate your account"
+			aria-describedby="github-login-description"
+			role="button"
 			tabIndex={0}
+			
 		>
 			Continue with GitHub
+			
 		</StyledGithubButton>
 	</Stack>
 	)

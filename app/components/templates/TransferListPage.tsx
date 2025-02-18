@@ -15,8 +15,9 @@ export default function TransferListPage() {
 	}
 
 	return (
-		<Box>
+		<Box role="main" aria-label="Transfer list page">
 			<Box
+				component="header"
 				sx={{
 					display: 'flex',
 					justifyContent: 'space-between',
@@ -25,20 +26,23 @@ export default function TransferListPage() {
 				}}
 			>
 				<Typography
-					variant="h4"
+					variant="h1"
 					gutterBottom
+					tabIndex={0}
+					aria-label="Transfers section"
 				>
 					Transfers
 				</Typography>
-			
-					<Button
-						variant="contained"
-						color="primary"
-						onClick={handleAddTransferencia}
-					>
-						Add transfer
-					</Button>
-				
+
+				<Button
+					variant="contained"
+					color="primary"
+					onClick={handleAddTransferencia}
+					aria-label="Create new transfer"
+					accessKey="n"
+				>
+					Add transfer
+				</Button>
 			</Box>
 
 			<TransferTable />

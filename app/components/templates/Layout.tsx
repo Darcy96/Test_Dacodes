@@ -12,15 +12,35 @@ interface LayoutProps {
 function Layout({ children }: LayoutProps) {
 	const router = useRouter()
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+		<Box 
+			component="div"
+			role="application"
+			sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+		>
 			<CssBaseline />
-			<AppBar position="static">
-				<Toolbar sx={{ justifyContent: 'space-between' }}>
+			<AppBar 
+				position="static"
+				component="header"
+				role="banner"
+			>
+				<Toolbar 
+					sx={{ justifyContent: 'space-between' }}
+					role="navigation"
+					aria-label="Main navigation"
+				>
 					<Typography
 						variant="h6"
 						component="div"
 						sx={{ flexGrow: 1, cursor: 'pointer' }}
 						onClick={() => router.push('/transfers')}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								router.push('/transfers')
+							}
+						}}
+						tabIndex={0}
+						role="link"
+						aria-label="Go to transfers page"
 					>
 						Test Dacodes
 					</Typography>
@@ -28,7 +48,19 @@ function Layout({ children }: LayoutProps) {
 				</Toolbar>
 			</AppBar>
 
-			<Box sx={{ flexGrow: 1, overflowY: 'auto', paddingX: '8vw', paddingY: '8vh', background: 'rgb(250, 250, 251)' }}> {children}</Box>
+			<Box 
+				component="main"
+				role="main"
+				sx={{ 
+					flexGrow: 1, 
+					overflowY: 'auto', 
+					paddingX: '8vw', 
+					paddingY: '8vh', 
+					background: 'rgb(250, 250, 251)' 
+				}}
+			> 
+				{children}
+			</Box>
 		</Box>
 	)
 }
