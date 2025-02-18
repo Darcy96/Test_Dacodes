@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
-import { AuthProvider, ReactQueryProvider } from './context'
 import { Layout } from '@components/templates'
+import Providers from './providers'
 
 export const metadata: Metadata = {
 	title: 'Create Next App',
@@ -16,11 +16,9 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body style={{ overflow: 'hidden' }}>
-				<ReactQueryProvider>
-					<AuthProvider>
-						<Layout>{children}</Layout>
-					</AuthProvider>
-				</ReactQueryProvider>
+				<Providers>
+					<Layout>{children}</Layout>	
+				</Providers>		
 			</body>
 		</html>
 	)

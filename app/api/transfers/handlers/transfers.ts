@@ -1,5 +1,5 @@
 import { transfersMock } from '@api/transfers/mock';
-import { Transferencia } from 'app/types';
+import { Transfers } from 'app/types';
 
 /**
  * 🌐 Transfer Management API
@@ -9,13 +9,13 @@ import { Transferencia } from 'app/types';
  */
 
 // 📜 Get all transfers
-export const getTransfers = async (): Promise<Transferencia[]> => {
+export const getTransfers = async (): Promise<Transfers[]> => {
     // Simulates fetching all transfer records
     return Promise.resolve(transfersMock);
 };
 
 // 🔍 Get a transfer by ID
-export const getTransferById = async (id: number): Promise<Transferencia> => {
+export const getTransferById = async (id: number): Promise<Transfers> => {
     // Finds a transfer record by its ID
     const transferencia = transfersMock.find((item) => item.id === id);
     if (transferencia) {
@@ -28,9 +28,9 @@ export const getTransferById = async (id: number): Promise<Transferencia> => {
 let currentId = transfersMock.length ? Math.max(...transfersMock.map((t) => t.id)) + 1 : 1;
 
 export const addTransfer = async (
-    transferencia: Omit<Transferencia, 'id'> // Excludes `id` from the input
-): Promise<Transferencia> => {
-    const newTransferencia: Transferencia = {
+    transferencia: Omit<Transfers, 'id'> // Excludes `id` from the input
+): Promise<Transfers> => {
+    const newTransferencia: Transfers = {
         id: currentId++, // Generates a new unique ID
         ...transferencia,
         created_at: new Date().toISOString(), // Adds a timestamp
@@ -42,8 +42,8 @@ export const addTransfer = async (
 // ✏️ Update an existing transfer
 export const updateTransfer = async (
     id: number,
-    updatedData: Partial<Transferencia> // Allows partial updates
-): Promise<Transferencia> => {
+    updatedData: Partial<Transfers> // Allows partial updates
+): Promise<Transfers> => {
     const index = transfersMock.findIndex((item) => item.id === id);
     if (index > -1) {
         transfersMock[index] = { ...transfersMock[index], ...updatedData }; // Merges updated data
@@ -53,7 +53,7 @@ export const updateTransfer = async (
 };
 
 // ❌ Delete a transfer
-export const deleteTransfer = async (id: number): Promise<Transferencia> => {
+export const deleteTransfer = async (id: number): Promise<Transfers> => {
     const index = transfersMock.findIndex((item) => item.id === id);
     if (index > -1) {
         const removed = transfersMock.splice(index, 1); // Removes the transfer from the mock data

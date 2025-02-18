@@ -1,16 +1,15 @@
 'use client'
 
 import { useAddTransfers, useClients, useDeleteTransfer, useTransferById, useUpdateTransfer } from '@api/transfers/hooks'
-import { Box, Button, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Button, Paper, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { DeleteForever } from '@mui/icons-material'
-import { Transferencia } from 'app/types'
+import { Transfers } from 'app/types'
 
 import { MyDialog, MySpinner } from '@components/molecules'
 import { TransferForm } from '@components/organisms'
-import { usePermissions } from '@hooks/usePermissions'
 
 interface Props {
 	transferId?: number
@@ -22,8 +21,6 @@ export default function TransferFormPage({ transferId }: Props) {
 	const { data: clients } = useClients() // 🎣 Fetching client data
 	const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')) // 📱 Checking if the screen is small
 
-	// 🎣 Accessing permissions and router instance
-	const { hasPermission } = usePermissions()
 	const router = useRouter()
 
 	// 🎣 React Query mutations for API interactions
@@ -33,7 +30,7 @@ export default function TransferFormPage({ transferId }: Props) {
 
 	// 🗃️ State variables for managing UI and data
 	const [open, setOpen] = useState(false) // 🗃️ State for dialog visibility
-	const [formData, setFormData] = useState<Omit<Transferencia, 'id'>>({
+	const [formData, setFormData] = useState<Omit<Transfers, 'id'>>({
 		// ℹ️ Form data (excluding 'id')
 		type: 'Venta',
 		service: 0,
@@ -95,27 +92,21 @@ export default function TransferFormPage({ transferId }: Props) {
 					color="textPrimary"
 					gutterBottom
 				>
-					{transferId ? (hasPermission('edit') ? 'Edit transfer' : 'Transfer information') : 'Create transfer'}
+					{transferId ? 'Edit transfer' : 'Create transfer'}
 				</Typography>
-				{transferId && hasPermission('delete') && (
-					<Tooltip
-						placement="left-start"
-						title={'Delete transfer'}
+
+				{transferId && (
+					<Button
+						aria-label="delete"
+						color="error"
+						size="small"
+						sx={{ width: 'fit-content', minWidth: '0px' }}
+						onClick={handleClickOpen}
+						startIcon={<DeleteForever />}
+						variant="contained"
 					>
-						<span>
-							<Button
-								aria-label="delete"
-								color="error"
-								size="small"
-								sx={{ width: 'fit-content', minWidth: '0px' }}
-								onClick={handleClickOpen}
-								startIcon={<DeleteForever />}
-								variant="contained"
-							>
-								Delete
-							</Button>
-						</span>
-					</Tooltip>
+						Delete
+					</Button>
 				)}
 			</Box>
 
@@ -123,7 +114,6 @@ export default function TransferFormPage({ transferId }: Props) {
 				formData={formData}
 				setFormData={setFormData}
 				clients={clients}
-				hasPermission={hasPermission}
 				create={create}
 				router={router}
 				edit={edit}

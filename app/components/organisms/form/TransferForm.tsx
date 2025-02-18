@@ -3,77 +3,90 @@
 import { Box, Button, MenuItem, TextField } from '@mui/material'
 import React, { useState } from 'react'
 
-import { Transferencia, Users } from 'app/types'
+import { Transfers, Users } from 'app/types'
 
 import { transferTypes } from '@constants/general'
 import { UseMutationResult } from '@tanstack/react-query'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 
 interface Props {
-	formData: Omit<Transferencia, 'id'>
-	setFormData: React.Dispatch<React.SetStateAction<Omit<Transferencia, 'id'>>>
-	clients: Users[] | undefined
-	hasPermission: (permission: string) => boolean
+	formData: Omit<Transfers, 'id'>
+	setFormData: React.Dispatch<React.SetStateAction<Omit<Transfers, 'id'>>>
+	clients?: Users[]
+	
 	transferId?: number
-	create: UseMutationResult<Transferencia, Error, Omit<Transferencia, 'id'>, unknown>
+	create: UseMutationResult<Transfers, Error, Omit<Transfers, 'id'>, unknown>
 	router: AppRouterInstance
 	edit: UseMutationResult<
-		Transferencia,
+		Transfers,
 		Error,
 		{
 			id: number
-			data: Partial<Transferencia>
+			data: Partial<Transfers>
 		},
 		unknown
 	>
 }
-export default function TransferForm({ transferId, create, edit, router, formData, setFormData, clients, hasPermission }: Props) {
-	const [errors, setErrors] = useState<{ [K in keyof Transferencia]?: boolean }>({
-		// ❌ State to track form errors
+export default function TransferForm({ transferId, create, edit, router, formData, setFormData, clients }: Props) {
+	const [errors, setErrors] = useState<Record<keyof Omit<Transfers, 'id' | 'created_at'>, boolean>>({
 		plate: false,
 		type: false,
 		client: false,
 		transmitter: false,
-		service: false
+		service: false,
+		
 	})
 
-	// 🔄 Handles changes in form inputs
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
-		setFormData((prev) => ({ ...prev, [name]: name === 'service' ? Number(value) : value }))
+		setFormData(prev => ({ ...prev, [name]: name === 'service' ? Number(value) : value }))
 	}
 
-	// ✅ Validates individual form fields
+	const getCommonTextFieldProps = (name: keyof typeof errors, label: string) => ({
+		label,
+		name,
+		value: formData[name],
+		onChange: handleChange,
+		error: errors[name],
+		helperText: errors[name] && 'This field is required',
+		slotProps: {
+			htmlInput: {
+				'aria-label': `${label}`,
+				'aria-required': 'true',
+				'aria-invalid': errors[name]
+			}
+		}
+	})
+
 	const validateField = (value: string | number | undefined) =>
 		value === undefined || (typeof value === 'string' && value.trim() === '') || (typeof value === 'number' && value <= 0)
 
-	// ✅ Validates the entire form
 	const validateForm = () => {
 		const newErrors = {
 			plate: validateField(formData.plate),
 			type: validateField(formData.type),
 			client: validateField(formData.client),
 			transmitter: validateField(formData.transmitter),
-			service: validateField(formData.service)
+			service: validateField(formData.service),
+			
 		}
 		setErrors(newErrors)
 		return !Object.values(newErrors).some(Boolean)
 	}
 
-	// 🚀 Handles form submission
 	const handleSubmit = async () => {
-		if (!validateForm()) return // 🚫 If form is invalid, prevent submission
-
+		if (!validateForm()) return
 		try {
-			// 📝 Submit data for creation or update based on transferId
-			transferId ? await edit.mutateAsync({ id: transferId as number, data: formData }) : await create.mutateAsync(formData)
-			router.replace('/transfers') // 🧭 Redirect to transfers page after successful submission
+			await (transferId 
+				? edit.mutateAsync({ id: transferId, data: formData })
+				: create.mutateAsync(formData))
+			router.replace('/transfers')
 		} catch (error) {
-			console.error('Error creating transfer:', error) // ❌ Log any errors during submission
+			console.error('Error creating transfer:', error)
 		}
 	}
 
-	const enableFields = hasPermission('edit') // 🔐 Check if the user has edit permission
+	const isLoading = create.status === 'pending' || edit.status === 'pending'
 
 	return (
 		<Box
@@ -81,114 +94,77 @@ export default function TransferForm({ transferId, create, edit, router, formDat
 			noValidate
 			autoComplete="off"
 			sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+			onSubmit={(e) => {
+				e.preventDefault()
+				handleSubmit()
+			}}
+			role="form"
+			aria-label="Transfer Form"
 		>
+			<TextField {...getCommonTextFieldProps('plate', 'Plate')} />
+			
 			<TextField
-				label="Plate"
-				name="plate"
-				disabled={!enableFields}
-				value={formData.plate}
-				onChange={handleChange}
-				error={errors.plate}
-				helperText={errors.plate && 'This field is required'}
-			/>
-			<TextField
-				disabled={!enableFields}
 				select
-				label="Transfer Type"
-				name="type"
-				value={formData.type}
-				onChange={handleChange}
-				error={errors.type}
-				helperText={errors.type && 'This field is required'}
+				{...getCommonTextFieldProps('type', 'Transfer Type')}
 			>
-				{transferTypes.map((type) => (
-					<MenuItem
-						key={type}
-						value={type}
-					>
+				{transferTypes.map(type => (
+					<MenuItem key={type} value={type} role="option" aria-selected={formData.type === type}>
 						{type}
 					</MenuItem>
 				))}
 			</TextField>
+
+			{['client', 'transmitter'].map(field => (
+				<TextField
+					key={field}
+					select
+					{...getCommonTextFieldProps(field as keyof typeof errors, field.charAt(0).toUpperCase() + field.slice(1))}
+				>
+					{!clients ? (
+						<MenuItem value="">Loading {field}s...</MenuItem>
+					) : (
+						clients
+							.filter(client => client.type === (field === 'client' ? 'Cliente' : 'Transmitente'))
+							.map(client => (
+								<MenuItem
+									key={client.id}
+									value={client.document}
+									role="option"
+									aria-selected={formData[field as keyof typeof formData] === client.document}
+								>
+									{client.name} - {client.document}
+								</MenuItem>
+							))
+					)}
+				</TextField>
+			))}
+
 			<TextField
-				disabled={!enableFields}
-				select
-				label="Client"
-				name="client"
-				value={formData.client}
-				onChange={handleChange}
-				error={errors.client}
-				helperText={errors.client && 'This field is required'}
-			>
-				{!clients ? (
-					<MenuItem value="">Loading clients...</MenuItem>
-				) : (
-					clients
-						.filter((client) => client.name.includes('Cliente'))
-						.map((client) => (
-							<MenuItem
-								key={client.id}
-								value={client.document}
-							>
-								{client.name} - {client.document}
-							</MenuItem>
-						))
-				)}
-			</TextField>
-			<TextField
-				disabled={!enableFields}
-				select
-				label="Transmitter"
-				name="transmitter"
-				value={formData.transmitter}
-				onChange={handleChange}
-				error={errors.transmitter}
-				helperText={errors.transmitter && 'This field is required'}
-			>
-				{!clients ? (
-					<MenuItem value="">Loading transmitter...</MenuItem>
-				) : (
-					clients
-						.filter((client) => client.name.includes('Transmitente'))
-						.map((client) => (
-							<MenuItem
-								key={client.id}
-								value={client.document}
-							>
-								{client.name} - {client.document}
-							</MenuItem>
-						))
-				)}
-			</TextField>
-			<TextField
-				disabled={!enableFields}
-				label="Service"
-				name="service"
 				type="number"
-				value={formData.service}
-				onChange={handleChange}
-				error={errors.service}
+				{...getCommonTextFieldProps('service', 'Service')}
 				helperText={errors.service && 'This field must be a valid number'}
 			/>
 
-			<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+			<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }} role="group" aria-label="Form actions">
 				<Button
 					variant="outlined"
 					color="info"
 					onClick={() => router.replace('/transfers')}
+					aria-label="Cancel and return to transfers"
 				>
-					{hasPermission('edit') ? 'Cancel' : 'Go back'}
+					Cancel
 				</Button>
-				{hasPermission('edit') && (
-					<Button
-						variant="contained"
-						color="primary"
-						onClick={handleSubmit}
-						disabled={create.status == 'pending'}
-					>
-						{create.status == 'pending' || edit.status == 'pending' ? 'Saving...' : 'Save'}
-					</Button>
-				)}
+				
+				<Button
+					variant="contained"
+					color="primary"
+					onClick={handleSubmit}
+					disabled={isLoading}
+					aria-busy={isLoading}
+					aria-label={isLoading ? 'Saving transfer' : 'Save transfer'}
+				>
+					{isLoading ? 'Saving...' : 'Save'}
+				</Button>
 			</Box>
 		</Box>
 	)

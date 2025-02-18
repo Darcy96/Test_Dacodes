@@ -1,6 +1,6 @@
 import { addTransfer, deleteTransfer, getTransferById, getTransfers, updateTransfer } from '@api/transfers/index'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Transferencia } from 'app/types'
+import { Transfers } from 'app/types'
 
 export const useTransfers = () => {
 	return useQuery({
@@ -13,7 +13,7 @@ export const useTransfers = () => {
 export const useAddTransfers = () => {
 	const queryClient = useQueryClient()
 
-	return useMutation<Transferencia, Error, Omit<Transferencia, 'id'>>({
+	return useMutation<Transfers, Error, Omit<Transfers, 'id'>>({
 		mutationFn: addTransfer,
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['transfers'] })
@@ -22,7 +22,7 @@ export const useAddTransfers = () => {
 }
 
 export const useTransferById = (id: number | false) => {
-	return useQuery<Transferencia, Error>({
+	return useQuery<Transfers, Error>({
 		queryKey: ['transferencia', id], // Clave única para cada transferencia por ID
 		queryFn: () => getTransferById(id as number), // Función que obtiene la transferencia por ID
 		enabled: !!id, // Solo ejecuta la consulta si el ID es válido
@@ -33,7 +33,7 @@ export const useTransferById = (id: number | false) => {
 export const useUpdateTransfer = () => {
 	const queryClient = useQueryClient()
 
-	return useMutation<Transferencia, Error, { id: number; data: Partial<Transferencia> }>({
+	return useMutation<Transfers, Error, { id: number; data: Partial<Transfers> }>({
 		mutationFn: ({ id, data }) => updateTransfer(id, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['transfers'] })
@@ -44,7 +44,7 @@ export const useUpdateTransfer = () => {
 export const useDeleteTransfer = () => {
 	const queryClient = useQueryClient()
 
-	return useMutation<Transferencia, Error, { id: number }>({
+	return useMutation<Transfers, Error, { id: number }>({
 		mutationFn: ({ id }) => deleteTransfer(id),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['transfers'] })

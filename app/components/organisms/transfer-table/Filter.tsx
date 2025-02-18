@@ -1,12 +1,12 @@
+'use client'
 import React from 'react'
 
-import { FormControl, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, TextField, Typography } from '@mui/material'
-
+import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, styled, TextField, Typography } from '@mui/material'
 import { transferTypes } from '@constants/general'
-import { Transferencia } from 'app/types'
+import { Transfers } from 'app/types'
 
 interface Props {
-	transfers: Transferencia[] | undefined
+	transfers: Transfers[] | undefined
 	filters: {
 		plate: string
 		type: string
@@ -19,6 +19,23 @@ interface Props {
 	>
 }
 
+const FilterContainer = styled(Box)`
+	padding: 10px;
+	display: flex;
+	gap: 8px;
+	margin-bottom: 16px;
+	align-items: center;
+	border-radius: 8px;
+	box-shadow: inherit;
+	color: rgb(230, 235, 241);
+	border: 1px solid;
+	background: white;
+`
+
+const StyledFormControl = styled(FormControl)`
+	min-width: 150px;
+`
+
 export default function Filter({ filters, setFilters }: Props) {
 	const handleTextFieldChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = e.target
@@ -27,27 +44,19 @@ export default function Filter({ filters, setFilters }: Props) {
 
 	const handleSelectChange = (e: SelectChangeEvent<string>) => {
 		const { name, value } = e.target
-
 		setFilters((prev) => ({ ...prev, [name!]: value === 'Show all' ? '' : value }))
 	}
 
 	return (
-		<Paper
-			sx={{
-				padding: '10px',
-				display: 'flex',
-				gap: '8px',
-				marginBottom: '16px',
-				alignItems: 'center',
-				borderRadius: '8px',
-				boxShadow: 'inherit',
-				color: 'rgb(230, 235, 241)',
-				border: '1px solid'
-			}}
+		<FilterContainer
+			role="search"
+			aria-label="Transfer filters"
 		>
 			<Typography
 				color="textPrimary"
 				variant="h6"
+				component="h2"
+				id="filter-section-title"
 			>
 				Filter
 			</Typography>
@@ -58,11 +67,14 @@ export default function Filter({ filters, setFilters }: Props) {
 				onChange={handleTextFieldChange}
 				variant="outlined"
 				size="small"
+				aria-label="Filter by plate number"
+				slotProps={{
+					htmlInput: {
+						'aria-describedby': 'plate-hint',
+					},
+				}}
 			/>
-			<FormControl
-				size="small"
-				sx={{ minWidth: 150 }}
-			>
+			<StyledFormControl size="small">
 				<InputLabel id="type-label">Type</InputLabel>
 				<Select
 					labelId="type-label"
@@ -70,10 +82,15 @@ export default function Filter({ filters, setFilters }: Props) {
 					label="Type"
 					value={filters.type}
 					onChange={handleSelectChange}
+					aria-label="Filter by transfer type"
+					inputProps={{
+						'aria-describedby': 'type-hint',
+					}}
 				>
-					<MenuItem
-						key={'Show all'}
+					<MenuItem 
 						value="Show all"
+						role="option"
+						aria-label="Show all types"
 					>
 						<em>Show all</em>
 					</MenuItem>
@@ -81,12 +98,14 @@ export default function Filter({ filters, setFilters }: Props) {
 						<MenuItem
 							key={type}
 							value={type}
+							role="option"
+							aria-label={`Filter by ${type}`}
 						>
 							{type}
 						</MenuItem>
 					))}
 				</Select>
-			</FormControl>
-		</Paper>
+			</StyledFormControl>
+		</FilterContainer>
 	)
 }

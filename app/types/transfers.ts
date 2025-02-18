@@ -1,4 +1,4 @@
-export interface Transferencia {
+export interface Transfers {
 	id: number
 	plate: string
 	type: TransferType

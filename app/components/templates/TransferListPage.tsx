@@ -2,11 +2,11 @@
 import { Box, Button, Typography } from '@mui/material'
 
 import { TransferTable } from '@components/organisms'
-import { usePermissions } from 'app/hooks/usePermissions'
+
 import { useRouter } from 'next/navigation'
 
 export default function TransferListPage() {
-	const { hasPermission } = usePermissions() // 🔐 Accessing the user's permissions
+	
 	const router = useRouter() // 🧭 Accessing the Next.js router for navigation
 
 	// 🚀 Handling the creation of a new transfer
@@ -30,7 +30,7 @@ export default function TransferListPage() {
 				>
 					Transfers
 				</Typography>
-				{hasPermission('create') && (
+			
 					<Button
 						variant="contained"
 						color="primary"
@@ -38,7 +38,7 @@ export default function TransferListPage() {
 					>
 						Add transfer
 					</Button>
-				)}
+				
 			</Box>
 
 			<TransferTable />

@@ -1,50 +1,38 @@
 'use client'
 import { useTransfers } from '@api/transfers/hooks'
-import MySpinner from '@components/molecules/MySpinner'
+
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
-import { Transferencia } from 'app/types'
+import { Transfers } from 'app/types'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
 import Filter from './Filter'
+import { MySpinner } from '@components/index'
 
 export default function TransferTable() {
-	const router = useRouter() // 🧭 Accessing the Next.js router
-	const { data: transfers, isLoading, isError, error } = useTransfers() // 🎣 Fetching transfers data using a custom hook
-	const [spinnerMessage, setSpinnerMessage] = useState<string>('Loading transfers') // 💬 State for managing spinner message
-	const [headers, setHeaders] = useState<false | (keyof Transferencia)[]>() // 🗃️ State for storing table headers
-
-	// 🗃️ State for managing filter values
+	const router = useRouter()
+	const { data: transfers, isLoading, isError, error } = useTransfers()
+	const [spinnerMessage, setSpinnerMessage] = useState('')
+	const [headers, setHeaders] = useState<(keyof Transfers)[] | null>(null)
 	const [filters, setFilters] = useState({ plate: '', type: '' })
 
-	// 🔄 Filtering transfers based on filter values using useMemo for optimization
+	// Optimized filtering
 	const filteredTransfers = useMemo(() => {
-		if (!transfers) return []
-		const plateFilter = filters.plate.toLowerCase()
-		return transfers.filter((t) => t.plate.toLowerCase().includes(plateFilter) && (filters.type === '' || t.type === filters.type))
+		if (!transfers?.length) return []
+		return transfers.filter((t) => t.plate.toLowerCase().includes(filters.plate.toLowerCase()) && (!filters.type || t.type === filters.type))
 	}, [transfers, filters])
 
-	// 🔄 useEffect hook to manage spinner message and table headers
+	// Simplified useEffect
 	useEffect(() => {
-		if (isLoading) {
-			setSpinnerMessage('Loading transfers') // 💬 Setting spinner message while loading
-		}
-		if (isError) {
-			setSpinnerMessage(`Error: ${error.message}`) // 💬 Setting error message if fetching fails
-		}
-		if (filteredTransfers.length === 0 || transfers?.length === 0) {
-			setSpinnerMessage('No transfers available') // 💬 Setting message if no transfers are found
-		} else {
-			if (headers === undefined) {
-				setHeaders(() => Object.keys(filteredTransfers[0]) as (keyof Transferencia)[]) // 🗃️ Setting table headers from the first transfer object
-			}
-		}
-		setSpinnerMessage('') // 💬 Clearing spinner message when data is available
-	}, [isLoading, isError, filteredTransfers, headers])
+		if (isLoading) return setSpinnerMessage('Loading transfers')
+		if (isError) return setSpinnerMessage(`Error: ${error.message}`)
+		if (!filteredTransfers.length) return setSpinnerMessage('No transfers available')
 
-	// 🚀 Handling row clicks to navigate to the edit page for the selected transfer
-	const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
-		router.push(`/transfers/edit/${id}`) // 🧭 Navigating to the edit page with the transfer ID
-	}
+		if (!headers && filteredTransfers.length) {
+			setHeaders(Object.keys(filteredTransfers[0]) as (keyof Transfers)[])
+		}
+		setSpinnerMessage('')
+	}, [isLoading, isError, error, filteredTransfers, headers])
+
 	return (
 		<Box>
 			<Filter
@@ -52,7 +40,7 @@ export default function TransferTable() {
 				setFilters={setFilters}
 				transfers={transfers}
 			/>
-			{spinnerMessage !== '' ? (
+			{spinnerMessage ? (
 				<MySpinner message={spinnerMessage} />
 			) : (
 				<Paper sx={{ borderRadius: '8px', boxShadow: 'inherit', color: 'rgb(230, 235, 241)', border: '1px solid' }}>
@@ -64,9 +52,9 @@ export default function TransferTable() {
 										{headers.map((header) => (
 											<TableCell key={header}>
 												<Typography
-													textTransform={'capitalize'}
 													variant="subtitle1"
 													fontWeight={600}
+													textTransform="capitalize"
 												>
 													{header.replace(/_/g, ' ')}
 												</Typography>
@@ -75,16 +63,16 @@ export default function TransferTable() {
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									{filteredTransfers.map((transferencia) => (
+									{filteredTransfers.map((transfer) => (
 										<TableRow
-											sx={{ cursor: 'pointer' }}
 											hover
-											key={transferencia.id}
-											onClick={(event) => handleClick(event, transferencia.id)}
+											key={transfer.id}
+											sx={{ cursor: 'pointer' }}
+											onClick={() => router.push(`/transfers/edit/${transfer.id}`)}
 										>
 											{headers.map((header) => (
 												<TableCell key={header}>
-													{header === 'created_at' ? new Date(transferencia[header] as string).toLocaleString() : transferencia[header]}
+													{header === 'created_at' ? new Date(transfer[header] as string).toLocaleString() : transfer[header]}
 												</TableCell>
 											))}
 										</TableRow>

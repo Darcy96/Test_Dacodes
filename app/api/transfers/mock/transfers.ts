@@ -1,6 +1,6 @@
-import { Transferencia } from "app/types";
+import { Transfers } from "app/types";
 
-export const transfersMock:Transferencia[] = [
+export const transfersMock:Transfers[] = [
     {
       id: 1,
       plate: '2647KLR',
